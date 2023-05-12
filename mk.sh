@@ -258,7 +258,7 @@ if [ -f "$FIN_BIN_DIR/bin/zsh" ]; then # Check if the bin file for BINNAME exist
 	rm -rf $BIN_NAME/certs/
 	rm -rf $BIN_NAME/include/
 	rm -rf $BIN_NAME/bin/{gio,glib-compile-resources,gdbus,gsettings,gapplication,gresource,pytho,gio-querymodules,gobject-query,glib-compile-schemas}
-	rm -rf $BIN_NAME/share/{doc,autoconf,man,gdb,glib-2.0,automake-1.16,aclocal-1.16,aclocal,bash-completion,gtk-doc,glib2-0,info,libtool,pkgconfig,readline,tabset,util-macros,vala,xcb,zcb,zsh}
+	rm -rf $BIN_NAME/share/{doc,autoconf,man,gdb,glib-2.0,automake-1.16,aclocal-1.16,aclocal,bash-completion,gtk-doc,glib2-0,info,libtool,pkgconfig,readline,tabset,util-macros,vala,xcb,zcb}
 	rm -rf $BIN_NAME/lib/{python3.7/test,pkgconfig,cmake}
 	rm -rf $BIN_NAME/xml
 	rm -rf $BIN_NAME/misc
