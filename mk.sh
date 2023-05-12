@@ -5,7 +5,7 @@ unset files
 unset log_files
 
 export ROOTDIR="${PWD}"
-export BIN_NAME="zsh"
+export BIN_NAME="Rom_Weasal"
 export SD_DIR="App"
 export FIN_BIN_DIR="/mnt/SDCARD/$SD_DIR/$BIN_NAME"
 export CROSS_COMPILE="arm-linux-gnueabihf"
@@ -96,11 +96,6 @@ cd ~/workspace/
 urls=(
 	"https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
 	"https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz"
-	"https://ftp.gnu.org/gnu/libtool/libtool-2.4.7.tar.xz"
-	"https://ftp.gnu.org/gnu/m4/m4-latest.tar.xz"
-	"https://github.com/openssl/openssl/releases/download/openssl-3.1.0/openssl-3.1.0.tar.gz"
-	"https://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz"
-	"https://ftp.gnu.org/gnu/automake/automake-1.16.5.tar.xz"
 	"https://www.zsh.org/pub/zsh-5.9.tar.xz"
 )
 
@@ -126,12 +121,7 @@ echo -e "\n\n\033[32mAll downloads finished, now building..\033[0m\n\n"
 # Check all files have downloaded before trying to build
 
 files=(
-	"autoconf-latest.tar.gz"
-	"automake-1.16.5.tar.xz"
-	"libtool-2.4.7.tar.xz"
-	"m4-latest.tar.xz"
 	"ncurses-6.4.tar.gz"
-	"openssl-3.1.0.tar.gz"
 	"pkg-config-0.29.2.tar.gz"
 	"zsh-5.9.tar.xz"
 )
@@ -172,45 +162,10 @@ wait $!
 cd pkg-config-0.29.2
 ./configure CC=$CC AR=$AR RANLIB=$RANLIB LD=$LD --host=$HOST --build=$BUILD --target=$TARGET --prefix=$FIN_BIN_DIR --disable-shared --with-internal-glib glib_cv_stack_grows=no glib_cv_stack_grows=no glib_cv_uscore=no ac_cv_func_posix_getpwuid_r=yes ac_cv_func_posix_getgrgid_r=yes &
 wait $!
-make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/pkgconfigbuildlog.txt 2>&1  &
+make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/pkg-config-0.29.2.txt 2>&1  &
 wait $!
 export PKG_CONFIG_PATH="$FIN_BIN_DIR/lib/pkgconfig"
 export PKG_CONFIG="$FIN_BIN_DIR/bin/pkg-config"
-cd ..
-
-# m4
-echo -e "-Compiling \033[32mm4\033[0m"
-tar -xf m4-latest.tar.xz &
-wait $!
-cd m4-1.4.19
-./configure CC=$CC LD=$LD --host=$HOST --build=$BUILD --target=$TARGET  --prefix=$FIN_BIN_DIR &
-wait $!
-make clean && make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/m4-1.4.19.txt 2>&1 &
-wait $!
-cd ..
-
-# Autoconf
-echo -e "-Compiling \033[32mautoconf\033[0m"
-tar -xf autoconf-latest.tar.gz &
-wait $!
-cd autoconf-2.71/
-./configure CC=$CC --host=$HOST --build=$BUILD --prefix=$FIN_BIN_DIR M4=$FIN_BIN_DIR/bin/m4 &
-wait $!
-make clean && make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/autoconf-2.71.txt 2>&1 &
-cd ..
-
-export M4=$FIN_BIN_DIR/bin/m4
-
-#Cross Compile Libtool
-echo -e "-Compiling \033[32mlibtool\033[0m"
-tar -xf libtool-2.4.7.tar.xz &
-wait $!
-cd libtool-2.4.7
-./configure CC=$CC --host=$HOST --build=$BUILD --target=$TARGET --prefix=$FIN_BIN_DIR M4=$FIN_BIN_DIR/bin/m4 &
-wait $!
-make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/libtool-2.4.7.txt 2>&1 &
-wait $!
-$FIN_BIN_DIR/bin/libtool --finish $FIN_BIN_DIR/lib
 cd ..
 
 # Cross compile ncursesW
@@ -235,42 +190,6 @@ make clean && make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) >
 wait $!
 cd ..
 
-# Automake
-echo -e "-Compiling \033[32mautomake\033[0m"
-tar -xf automake-1.16.5.tar.xz &
-wait $!
-cd automake-1.16.5
-./configure CC=$CC --host=$HOST --build=$BUILD --prefix=$FIN_BIN_DIR AUTOCONF=$FIN_BIN_DIR/bin/autoconf &
-wait $!
-make clean && make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/automake-1.16.5.txt 2>&1 &
-wait $!
-cd ..
-
-#Cross Compile Libtool
-echo -e "-Compiling \033[32mlibtool\033[0m"
-tar -xf libtool-2.4.7.tar.xz &
-wait $!
-cd libtool-2.4.7
-./configure CC=$CC --host=$HOST --build=$BUILD --target=$TARGET --prefix=$FIN_BIN_DIR M4=$FIN_BIN_DIR/bin/m4 &
-wait $!
-make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/libtool-2.4.7.txt 2>&1 &
-wait $!
-$FIN_BIN_DIR/bin/libtool --finish $FIN_BIN_DIR/lib
-cd ..
-
-#Cross compile OpenSSL 
-echo -e "-Compiling \033[32mopenssl\033[0m"
-export CROSS_COMPILE="" #  set this or it gets confused as $CROSS_COMPILE appears on the cc lines already
-tar -xf openssl-3.1.0.tar.gz
-cd openssl-3.1.0
-./Configure --prefix=$FIN_BIN_DIR --openssldir=$FIN_BIN_DIR linux-generic32 shared -DL_ENDIAN PROCESSOR=ARM &
-wait $!
-make clean && make -j$(( $(nproc) - 2 )) && make install -j$(( $(nproc) - 2 )) > ../logs/openssl-3.1.0.txt &
-wait $!
-cd ..
-export CROSS_COMPILE="arm-linux-gnueabihf" #  set back
-
-
 export CPPFLAGS="-I$FIN_BIN_DIR/include -I$FIN_BIN_DIR/include/ncurses -I$FIN_BIN_DIR/include/ncursesw"
 export LDFLAGS="-L$FIN_BIN_DIR/lib/ -lpanel -lncurses -ltinfo"
 
@@ -291,14 +210,9 @@ cd ..
 echo -e "\n\n\n"
 
 log_files=(				   					   
-	"autoconf-latest.txt"
-	"automake-1.16.5.txt"
-	"libtool-2.4.7.txt"
-	"m4-latest.txt"
 	"ncurses-6.4.txt"
-	"openssl-3.1.0.txt"
 	"pkg-config-0.29.2.txt"
-	"zsh-5.9.txt"
+	"zsh.txt"
 )
 
 for log_file in "${log_files[@]}"
@@ -316,7 +230,7 @@ done
 # Edit some files
 # All this is done if the ncspot bin was installed to the bin folder.
 
-if [ -f "$FIN_BIN_DIR/bin/$BIN_NAME" ]; then # Check if the bin file for BINNAME exists. $FIN_BIN_DIR changes to $ROOTDIR here as it gets copied to the workspace.
+if [ -f "$FIN_BIN_DIR/bin/zsh" ]; then # Check if the bin file for BINNAME exists. $FIN_BIN_DIR changes to $ROOTDIR here as it gets copied to the workspace.
 	echo -e "\n\n"
 	echo "Preparing export folder"
 	echo -e "\n\n"
@@ -336,8 +250,6 @@ if [ -f "$FIN_BIN_DIR/bin/$BIN_NAME" ]; then # Check if the bin file for BINNAME
 	cp  $ROOTDIR/$BIN_NAME/lib/libmenu.so.6.4 $ROOTDIR/$BIN_NAME/lib/libmenu.so.6
 	rm  $ROOTDIR/$BIN_NAME/lib/libtinfow.so.6
 	cp  $ROOTDIR/$BIN_NAME/lib/libtinfow.so.6.4 $ROOTDIR/$BIN_NAME/lib/libtinfow.so.6
-	rm  $ROOTDIR/$BIN_NAME/lib/libxml2.so.2
-	cp  $ROOTDIR/$BIN_NAME/lib/libxml2.so.2.9.12 $ROOTDIR/$BIN_NAME/lib/libxml2.so.2
 	
 	# remove some excess fat from the end product dir
 	rm -rf $BIN_NAME/aclocal/
@@ -346,7 +258,7 @@ if [ -f "$FIN_BIN_DIR/bin/$BIN_NAME" ]; then # Check if the bin file for BINNAME
 	rm -rf $BIN_NAME/certs/
 	rm -rf $BIN_NAME/include/
 	rm -rf $BIN_NAME/bin/{gio,glib-compile-resources,gdbus,gsettings,gapplication,gresource,pytho,gio-querymodules,gobject-query,glib-compile-schemas}
-	rm -rf $BIN_NAME/share/{doc,autoconf,man,gdb,glib-2.0,automake-1.16,aclocal-1.16,aclocal,bash-completion,gtk-doc,glib2-0,info,libtool,pkgconfig,readline,tabset,terminfo,util-macros,vala,xcb,zcb,zsh}
+	rm -rf $BIN_NAME/share/{doc,autoconf,man,gdb,glib-2.0,automake-1.16,aclocal-1.16,aclocal,bash-completion,gtk-doc,glib2-0,info,libtool,pkgconfig,readline,tabset,util-macros,vala,xcb,zcb,zsh}
 	rm -rf $BIN_NAME/lib/{python3.7/test,pkgconfig,cmake}
 	rm -rf $BIN_NAME/xml
 	rm -rf $BIN_NAME/misc
