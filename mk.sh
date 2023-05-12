@@ -5,7 +5,7 @@ unset files
 unset log_files
 
 export ROOTDIR="${PWD}"
-export BIN_NAME="Rom_Weasal"
+export BIN_NAME="zsh"
 export SD_DIR="App"
 export FIN_BIN_DIR="/mnt/SDCARD/$SD_DIR/$BIN_NAME"
 export CROSS_COMPILE="arm-linux-gnueabihf"
